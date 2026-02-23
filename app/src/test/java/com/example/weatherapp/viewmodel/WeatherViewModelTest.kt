@@ -59,9 +59,8 @@ class WeatherViewModelTest {
         advanceUntilIdle()  // wait for coroutine to complete
 
         val state = viewModel.uiState.value
-        assertEquals(weather, state.weather)
-        assertFalse(state.isLoading)
-        assertNull(state.error)
+        assertTrue(state is WeatherUiState.Success)
+        assertEquals(weather, (state as WeatherUiState.Success).weather)
         
         // Verify city was saved to preferences
         verify { preferencesHelper.saveLastCity("Krugerville") }
@@ -77,9 +76,8 @@ class WeatherViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        assertNull(state.weather)
-        assertFalse(state.isLoading)
-        assertEquals(exception, state.error)
+        assertTrue(state is WeatherUiState.Error)
+        assertEquals(exception, (state as WeatherUiState.Error).error)
     }
 
     @Test
@@ -102,9 +100,8 @@ class WeatherViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        assertEquals(weather, state.weather)
-        assertFalse(state.isLoading)
-        assertNull(state.error)
+        assertTrue(state is WeatherUiState.Success)
+        assertEquals(weather, (state as WeatherUiState.Success).weather)
     }
 
     @Test
@@ -117,9 +114,8 @@ class WeatherViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        assertNull(state.weather)
-        assertFalse(state.isLoading)
-        assertEquals(exception, state.error)
+        assertTrue(state is WeatherUiState.Error)
+        assertEquals(exception, (state as WeatherUiState.Error).error)
     }
 
     @Test
@@ -127,8 +123,8 @@ class WeatherViewModelTest {
         viewModel.onLocationPermissionDenied()
 
         val state = viewModel.uiState.value
-        assertTrue(state.error is LocationPermissionDeniedException)
-        assertFalse(state.isLoading)
+        assertTrue(state is WeatherUiState.Error)
+        assertTrue((state as WeatherUiState.Error).error is LocationPermissionDeniedException)
     }
 
     @Test
@@ -138,7 +134,7 @@ class WeatherViewModelTest {
         viewModel.clearError()
 
         val state = viewModel.uiState.value
-        assertNull(state.error)
+        assertTrue(state is WeatherUiState.Empty)
     }
 
     @Test
@@ -154,7 +150,8 @@ class WeatherViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        assertEquals(weather, state.weather)
+        assertTrue(state is WeatherUiState.Success)
+        assertEquals(weather, (state as WeatherUiState.Success).weather)
     }
 
     @Test
@@ -166,6 +163,6 @@ class WeatherViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        assertNull(state.weather)
+        assertTrue(state is WeatherUiState.Empty)
     }
 }

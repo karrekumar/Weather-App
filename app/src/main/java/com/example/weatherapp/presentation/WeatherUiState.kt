@@ -1,8 +1,9 @@
 package com.example.weatherapp.presentation
 import com.example.weatherapp.domain.model.Weather
 
-data class WeatherUiState(
-    val weather: Weather? = null,
-    val isLoading: Boolean = false,
-    val error: Throwable? = null
-)
+sealed interface WeatherUiState {
+    data object Empty : WeatherUiState
+    data object Loading : WeatherUiState
+    data class Success(val weather: Weather) : WeatherUiState
+    data class Error(val error: Throwable) : WeatherUiState
+}

@@ -12,6 +12,10 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
+/**
+ * Unit tests for [GetWeatherByCityUseCase].
+ * Ensures that the use case correctly interacts with the repository and handles success/failure states.
+ */
 class GetWeatherByCityUseCaseTest {
 
     private val repository: WeatherRepository = mockk()
@@ -22,6 +26,10 @@ class GetWeatherByCityUseCaseTest {
         useCase = GetWeatherByCityUseCase(repository)
     }
 
+    /**
+     * Verifies that the use case returns a success Result containing the weather data
+     * when the repository successfully fetches data.
+     */
     @Test
     fun `returns success when repository returns weather`() = runTest {
         val weather = Weather("Krugerville", 8.7, "clear sky", "icon")
@@ -33,6 +41,10 @@ class GetWeatherByCityUseCaseTest {
         assertEquals(weather, result.getOrNull())
     }
 
+    /**
+     * Verifies that the use case returns a failure Result containing the exception
+     * when the repository throws an exception (e.g. network error).
+     */
     @Test
     fun `returns failure when repository throws exception`() = runTest {
         val exception = RuntimeException("API error")

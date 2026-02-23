@@ -93,8 +93,9 @@ fun WeatherScreen(
      * Distinguishes between location permission errors and API/network errors
      * to provide user-friendly, context-specific messages.
      */
-    LaunchedEffect(uiState.error) {
-        uiState.error?.let { error ->
+    LaunchedEffect(uiState) {
+        if (uiState is WeatherUiState.Error) {
+            val error = (uiState as WeatherUiState.Error).error
             val message = when (error) {
                 is LocationPermissionDeniedException -> locationPermissionDenied
                 else -> error.message ?: errorMessage
@@ -113,14 +114,16 @@ fun WeatherScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            val weather = (uiState as? WeatherUiState.Success)?.weather
+
             WeatherContent(
-                weather = uiState.weather,
+                weather = weather,
                 onSearchCity = viewModel::searchCity,
                 modifier = Modifier.fillMaxSize()
             )
 
             // Show loading indicator during API calls
-            if (uiState.isLoading) {
+            if (uiState is WeatherUiState.Loading) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center)
                 )

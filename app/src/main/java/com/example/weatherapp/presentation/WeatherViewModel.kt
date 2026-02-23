@@ -38,7 +38,7 @@ class WeatherViewModel @Inject constructor(
     private val preferencesHelper: PreferencesHelper
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(WeatherUiState())
+    private val _uiState = MutableStateFlow<WeatherUiState>(WeatherUiState.Empty)
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
 
     /**
@@ -55,7 +55,7 @@ class WeatherViewModel @Inject constructor(
         if (city.isBlank()) return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { WeatherUiState.Loading }
 
             getWeatherByCityUseCase(city)
                 .onSuccess { weather ->
@@ -63,21 +63,13 @@ class WeatherViewModel @Inject constructor(
                     preferencesHelper.saveLastCity(city)
                     
                     _uiState.update {
-                        it.copy(
-                            weather = weather,
-                            isLoading = false,
-                            error = null
-                        )
+                        WeatherUiState.Success(weather)
                     }
                 }
                 .onFailure { exception ->
                     // Gracefully handle errors without crashing the app
                     _uiState.update {
-                        it.copy(
-                            weather = null,
-                            isLoading = false,
-                            error = exception
-                        )
+                        WeatherUiState.Error(exception)
                     }
                 }
         }
@@ -94,25 +86,17 @@ class WeatherViewModel @Inject constructor(
      */
     fun loadWeatherByLocation(latitude: Double, longitude: Double) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { WeatherUiState.Loading }
 
             getWeatherByLocationUseCase(latitude, longitude)
                 .onSuccess { weather ->
                     _uiState.update {
-                        it.copy(
-                            weather = weather,
-                            isLoading = false,
-                            error = null
-                        )
+                        WeatherUiState.Success(weather)
                     }
                 }
                 .onFailure { exception ->
                     _uiState.update {
-                        it.copy(
-                            weather = null,
-                            isLoading = false,
-                            error = exception
-                        )
+                        WeatherUiState.Error(exception)
                     }
                 }
         }
@@ -139,10 +123,7 @@ class WeatherViewModel @Inject constructor(
      */
     fun onLocationPermissionDenied() {
         _uiState.update {
-            it.copy(
-                isLoading = false,
-                error = LocationPermissionDeniedException()
-            )
+            WeatherUiState.Error(LocationPermissionDeniedException())
         }
     }
 
@@ -153,6 +134,8 @@ class WeatherViewModel @Inject constructor(
      * preventing the same error from showing repeatedly.
      */
     fun clearError() {
-        _uiState.update { it.copy(error = null) }
+        _uiState.update { 
+            if (it is WeatherUiState.Error) WeatherUiState.Empty else it 
+        }
     }
 }
