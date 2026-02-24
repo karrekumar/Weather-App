@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Weather App
 
 An Android weather app that shows current weather data using the OpenWeatherMap API. Built with Kotlin and Jetpack Compose.
@@ -121,3 +122,7 @@ Built with Kotlin and Jetpack Compose
 
 
 >>>>>>> 2ef70ec6e016cc6dc38a24ac3d0bd1e8346518e0
+=======
+# Weather-App
+An Android weather app that shows current weather data using the OpenWeatherMap API. Built with Kotlin and Jetpack Compose.
+>>>>>>> 74c82e4841cf789f5a4af43dd592561e8d045cd8
